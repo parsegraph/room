@@ -2,19 +2,17 @@ import { BlockCaret, BlockNode, DefaultBlockPalette } from "parsegraph-block";
 import Direction from "parsegraph-direction";
 import { elapsed } from "parsegraph-timing";
 import Method from "parsegraph-method";
-import Carousel from 'parsegraph-carousel';
+import Carousel from "parsegraph-carousel";
 
 const START_TIME = new Date();
 
 export type ListId = string | number;
 
 export interface ListType {
-  spawnItem(room:Room, value:any, children:any[], id:ListId):any;
+  spawnItem(room: Room, value: any, children: any[], id: ListId): any;
 }
 
-export interface ListItem {
-
-}
+export interface ListItem {}
 
 export function getRoomName() {
   const atSymbol = document.URL.lastIndexOf("/@");
@@ -47,6 +45,7 @@ export default class Room {
     this._carousel = carousel;
     this._root = new DefaultBlockPalette().spawn();
     this._listClasses = new Map();
+    this._update = new Method();
 
     if (roomId) {
       this._roomId = roomId;
@@ -119,6 +118,10 @@ export default class Room {
     };*/
 
     this._username = null;
+  }
+
+  togglePermissions(_:any) {
+
   }
 
   carousel() {
@@ -276,7 +279,7 @@ export default class Room {
       return null;
     }
     let foundId = null;
-    this._items.forEach((val:ListItem, key:ListId)=>{
+    this._items.forEach((val: ListItem, key: ListId) => {
       if (item === val) {
         foundId = key;
       }
@@ -315,7 +318,9 @@ export default class Room {
     const listeners = this._itemListeners[id];
     if (listeners) {
       // console.log("Listeners for item: " + id);
-      listeners.forEach((cb:any)=>{cb[0].call(cb[1], event)});
+      listeners.forEach((cb: any) => {
+        cb[0].call(cb[1], event);
+      });
       if (event.event === "destroyListItem") {
         this.unregister(id);
       }
@@ -362,12 +367,7 @@ export default class Room {
     );
   }
 
-  editListItem(
-    id: ListId,
-    value: any,
-    cb?: Function,
-    cbThisArg?: object
-  ) {
+  editListItem(id: ListId, value: any, cb?: Function, cbThisArg?: object) {
     this.request(
       {
         command: "editItem",

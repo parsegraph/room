@@ -52,6 +52,7 @@
     "parsegraph-log": "^1.7.3"
   },
   "dependencies": {
+    "jest-environment-jsdom": "^28.0.2",
     "parsegraph-block": "^4.4.15",
     "parsegraph-color": "^1.4.7",
     "parsegraph-direction": "^2.1.0",
