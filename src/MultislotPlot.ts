@@ -5,7 +5,7 @@ import {
   copyStyle,
   DefaultBlockPalette,
 } from "parsegraph-block";
-import { ActionCarousel } from "parsegraph-carousel";
+import { ActionCarousel } from "parsegraph-viewport";
 import Color from "parsegraph-color";
 import Multislot from "./Multislot";
 import Direction from "parsegraph-direction";

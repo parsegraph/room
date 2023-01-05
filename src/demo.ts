@@ -6,9 +6,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const topElem = document.getElementById("room");
   topElem.style.position = "relative";
 
-  const viewport = new Navport();
+  const viewport = new Navport(null);
   const room = new Room(viewport.carousel(), getRoomName());
   room.addLoader("multislot", new MultislotType());
   viewport.setRoot(room.node());
+  viewport.showInCamera(room.node());
   render(topElem, viewport);
 });

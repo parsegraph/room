@@ -1,7 +1,7 @@
 import Room, { ListType } from "./Room";
 import Color from "parsegraph-color";
 import { BlockCaret, BlockNode, copyStyle } from "parsegraph-block";
-import { ActionCarousel } from "parsegraph-carousel";
+import { ActionCarousel } from "parsegraph-viewport";
 import MultislotPlot from "./MultislotPlot";
 
 export type MultislotSubtype = number;
