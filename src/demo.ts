@@ -8,7 +8,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const viewport = new Navport(null);
   const room = new Room(viewport.carousel(), getRoomName());
+  room.setUsername("aaronfaanes");
   room.addLoader("multislot", new MultislotType());
+  room.load([
+    {
+      id: "1",
+      type: "multislot",
+      value: JSON.stringify([0, 6, 6, 255, 255, 255]),
+      items: [],
+    },
+    {
+      id: "2",
+      type: "multislot",
+      value: JSON.stringify([1, 6, 6, .75*255, .75*255, .75*255]),
+      items: [],
+    },
+    {
+      id: "3",
+      type: "multislot",
+      value: JSON.stringify([2, 6, 6, .5*255, .5*255, .5*255]),
+      items: [],
+    },
+    {
+      id: "4",
+      type: "multislot",
+      value: JSON.stringify([3, 6, 6, .25*255, .25*255, .25*255]),
+      items: [],
+    },
+    {
+      id: "5",
+      type: "multislot",
+      value: JSON.stringify([4, 6, 6, 0, 0, 0]),
+      items: [],
+    },
+  ]);
   viewport.setRoot(room.node());
   viewport.showInCamera(room.node());
   render(topElem, viewport);
