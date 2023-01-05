@@ -12,7 +12,12 @@ export interface ListType {
   spawnItem(room: Room, value: any, children: any[], id: ListId): any;
 }
 
-export interface ListItem {}
+export interface ListItem {
+  id: string;
+  type: string;
+  value: any;
+  items: ListItem[];
+}
 
 export function getRoomName() {
   const atSymbol = document.URL.lastIndexOf("/@");
@@ -41,7 +46,7 @@ export default class Room {
   _listClasses: Map<string, ListType>;
   _carousel: Carousel;
 
-  constructor(carousel: Carousel, roomId: string) {
+  constructor(carousel: Carousel, roomId: string = null) {
     this._carousel = carousel;
     this._root = new DefaultBlockPalette().spawn();
     this._listClasses = new Map();
@@ -120,8 +125,8 @@ export default class Room {
     this._username = null;
   }
 
-  togglePermissions(_:any) {
-
+  togglePermissions(_: any) {
+    alert("Toggle permissions");
   }
 
   carousel() {
@@ -140,7 +145,7 @@ export default class Room {
     this._update.call();
   }
 
-  load(items: any) {
+  load(items: ListItem[]) {
     this._root.disconnectNode(Direction.DOWNWARD);
     const car = new BlockCaret(this._root);
     car.spawnMove("d", "u", "c");
