@@ -20,19 +20,19 @@ document.addEventListener("DOMContentLoaded", () => {
     {
       id: "2",
       type: "multislot",
-      value: JSON.stringify([1, 6, 6, .75*255, .75*255, .75*255]),
+      value: JSON.stringify([1, 6, 6, 0.75 * 255, 0.75 * 255, 0.75 * 255]),
       items: [],
     },
     {
       id: "3",
       type: "multislot",
-      value: JSON.stringify([2, 6, 6, .5*255, .5*255, .5*255]),
+      value: JSON.stringify([2, 6, 6, 0.5 * 255, 0.5 * 255, 0.5 * 255]),
       items: [],
     },
     {
       id: "4",
       type: "multislot",
-      value: JSON.stringify([3, 6, 6, .25*255, .25*255, .25*255]),
+      value: JSON.stringify([3, 6, 6, 0.25 * 255, 0.25 * 255, 0.25 * 255]),
       items: [],
     },
     {
