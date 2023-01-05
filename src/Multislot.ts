@@ -41,7 +41,7 @@ export default class Multislot {
     const multislotActions = new ActionCarousel(room.carousel());
     multislotActions.addAction(
       "Edit",
-      ()=>{
+      () => {
         this.room().togglePermissions(this.id());
       },
       this
@@ -85,7 +85,7 @@ export default class Multislot {
     const plot = new MultislotPlot(this, index);
     this._plots.push(plot);
     return plot;
-  };
+  }
 
   cs() {
     const cs = copyStyle("u");
@@ -118,7 +118,7 @@ export default class Multislot {
         // console.log(x + ", " + y);
       }
       car.pop();
-      //car.crease();
+      // car.crease();
     }
   }
 
@@ -150,7 +150,7 @@ export default class Multislot {
       }
       car.pop();
       car.pull("d");
-      //car.crease();
+      // car.crease();
     }
   }
 
@@ -185,7 +185,7 @@ export default class Multislot {
       }
       car.pop();
       car.pull("d");
-      //car.crease();
+      // car.crease();
     }
   }
 
@@ -220,7 +220,7 @@ export default class Multislot {
       }
       car.pop();
       car.pull("d");
-      //car.crease();
+      // car.crease();
     }
   }
 
@@ -256,7 +256,7 @@ export default class Multislot {
         console.log(x + ", " + y);
       }
       car.pop();
-      //car.crease();
+      // car.crease();
     }
   }
 

@@ -53,44 +53,33 @@ export default class MultislotPlot {
 
     const carousel = multislot.room().carousel();
     this._unclaimedActions = new ActionCarousel(carousel);
-    this._unclaimedActions.addAction(
-      "Claim",
-      ()=>{
-        const room = this._multislot.room();
-        const username = room.username();
-        if (!username) {
-          throw new Error("Room must have a valid username");
-        }
-        this.room().submit(new ClaimPlotAction(this, username));
+    this._unclaimedActions.addAction("Claim", () => {
+      console.log("Claiming");
+      const room = this._multislot.room();
+      const username = room.username();
+      if (!username) {
+        throw new Error("Room must have a valid username");
       }
-    );
+      this.room().submit(new ClaimPlotAction(this, username));
+    });
     this._actionRemover = this._unclaimedActions.install(car.node());
     car.move("u");
 
     const addDefaultActions = (ac: ActionCarousel) => {
-      ac.addAction(
-        "Edit",
-        ()=>{
-          this.room().togglePermissions(this.id());
-        }
-      );
-      ac.addAction(
-        "Unclaim",
-        ()=>{
-          this.room().submit(new UnclaimPlotAction(this));
-        }
-      );
+      ac.addAction("Edit", () => {
+        this.room().togglePermissions(this.id());
+      });
+      ac.addAction("Unclaim", () => {
+        this.room().submit(new UnclaimPlotAction(this));
+      });
     };
     this._populatedActions = new ActionCarousel(carousel);
     addDefaultActions(this._populatedActions);
 
     this._claimedActions = new ActionCarousel(carousel);
-    this._claimedActions.addAction(
-      "Lisp",
-      () => {
-        this.room().pushListItem(this.id() , "lisp", "");
-      }
-    );
+    this._claimedActions.addAction("Lisp", () => {
+      this.room().pushListItem(this.id(), "lisp", "");
+    });
     addDefaultActions(this._claimedActions);
   }
 
