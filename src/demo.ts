@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   topElem.style.position = "relative";
 
   const viewport = new Navport(null);
-  const room = new Room(viewport.carousel(), getRoomName());
+  const room = new Room(viewport, getRoomName());
   room.setUsername("aaronfaanes");
   room.addLoader("multislot", new MultislotType());
   room.load([
@@ -44,5 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
   ]);
   viewport.setRoot(room.node());
   viewport.showInCamera(room.node());
+  room.setOnScheduleUpdate(()=>viewport.scheduleRepaint());
   render(topElem, viewport);
 });

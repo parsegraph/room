@@ -1,6 +1,5 @@
 import {
   BlockCaret,
-  BlockNode,
   BlockStyle,
   copyStyle,
   DefaultBlockPalette,
@@ -9,13 +8,16 @@ import { ActionCarousel } from "parsegraph-viewport";
 import Color from "parsegraph-color";
 import Multislot from "./Multislot";
 import Direction from "parsegraph-direction";
+import TreeNode, {Spawner, BlockTreeNode} from 'parsegraph-treenode';
 
-export default class MultislotPlot {
+export default class MultislotPlot extends TreeNode {
   _multislot: Multislot;
   _index: number;
   _version: number;
-  _id: number;
-  _root: BlockNode;
+  _id: string | number;
+  _claimant: string;
+
+  _children: Spawner;
 
   _unclaimedStyle: BlockStyle;
   _claimedStyle: BlockStyle;
@@ -29,27 +31,42 @@ export default class MultislotPlot {
   _palette: DefaultBlockPalette;
 
   constructor(multislot: Multislot, index: number) {
+    super(multislot.nav());
+    this.setOnScheduleUpdate(()=>multislot.invalidate());
     this._index = index;
     this._multislot = multislot;
     this._version = 0;
     this._id = null;
+    this._claimant = null;
 
     this._palette = new DefaultBlockPalette();
+    this._children = new Spawner(multislot.room().nav(), []);
+    this._children.setOnScheduleUpdate(()=>{
+      this._root.connectNode(Direction.DOWNWARD, this._children.root());
+    });
+    this._children.setBuilder(()=>{
+      const n = new BlockTreeNode('u');
 
-    const car = new BlockCaret("s");
-    this._root = car.node();
-    this._root.value().setLabel("" + index);
+      const ac = new ActionCarousel(multislot.room().nav().carousel(), this._palette);
+      ac.addAction("Build a room", ()=>{
+      });
+      ac.addAction("Link to room", ()=>{
+      });
+      ac.addAction("Link to server", ()=>{
+      });
+      ac.addAction("Host a server", ()=>{
+      });
+      ac.install(n.root());
+      return n;
+    });
+
     const bs = copyStyle("s");
     bs.backgroundColor = multislot.color();
     this._unclaimedStyle = bs;
-    this._root.value().setBlockStyle(bs);
 
     this._claimedStyle = copyStyle("s");
     this._claimedStyle.backgroundColor = new Color(1, 1, 1);
 
-    car.spawn("d", "u");
-    car.pull("d");
-    car.move("d");
 
     const carousel = multislot.room().carousel();
     this._unclaimedActions = new ActionCarousel(carousel);
@@ -62,8 +79,6 @@ export default class MultislotPlot {
       }
       this.room().submit(new ClaimPlotAction(this, username));
     });
-    this._actionRemover = this._unclaimedActions.install(car.node());
-    car.move("u");
 
     const addDefaultActions = (ac: ActionCarousel) => {
       ac.addAction("Edit", () => {
@@ -83,7 +98,30 @@ export default class MultislotPlot {
     addDefaultActions(this._claimedActions);
   }
 
-  setId(id: number) {
+  render() {
+    const car = new BlockCaret("s");
+    car.label(String(this._index));
+
+    if (this.isClaimed()) {
+      car.spawn("d", "b");
+      car.pull("d");
+      car.move("d");
+      car.node().value().setLabel(this.claimant());
+      car.node().value().setBlockStyle(this._claimedStyle);
+      car.node().connectNode(Direction.DOWNWARD, this._children.root());
+    } else {
+      car.spawn("d", "u");
+      car.pull("d");
+      car.move("d");
+      car.node().value().setLabel("");
+      car.node().value().setBlockStyle(this._unclaimedStyle);
+      this._unclaimedActions.install(car.node());
+    }
+
+    return car.root();
+  }
+
+  setId(id: number | string) {
     this._id = id;
   }
 
@@ -91,40 +129,31 @@ export default class MultislotPlot {
     return this._id;
   }
 
+  isClaimed() {
+    return this.claimant() !== null;
+  }
+
   claimant() {
-    const claimant = this._root.value().label();
-    if (claimant === "") {
-      return null;
-    }
-    return claimant;
+    return this._claimant;
+  }
+
+  children() {
+    return this._children;
   }
 
   claim(name: string) {
-    this._root.value().setLabel(name);
-    this._root.value().setBlockStyle(this._claimedStyle);
-    this.room().scheduleUpdate();
-    this._actionRemover();
-    this._actionRemover = this._claimedActions.install(
-      this._root.nodeAt(Direction.DOWNWARD)
-    );
+    this._claimant = name;
+    this.invalidate();
   }
 
   populate() {}
 
   depopulate() {
-    this._root.disconnectNode(Direction.DOWNWARD);
-    this._root.connectNode(Direction.DOWNWARD, this._palette.spawn("u"));
   }
 
   unclaim() {
-    this._actionRemover();
-    this._root.disconnectNode(Direction.DOWNWARD);
-    this._root.value().setLabel("");
-    const node = this._palette.spawn("u");
-    this._root.connectNode(Direction.DOWNWARD, node);
-    this._actionRemover = this._unclaimedActions.install(node);
-    this._root.value().setBlockStyle(this._unclaimedStyle);
-    this.room().scheduleUpdate();
+    this._claimant = null;
+    this.invalidate();
   }
 
   multislot() {
@@ -146,19 +175,15 @@ export default class MultislotPlot {
   index() {
     return this._index;
   }
-
-  node() {
-    return this._root;
-  }
 }
 
 class ClaimPlotAction {
-  _plot: any;
-  _username: any;
-  _originalClaimant: any;
-  _listener: any;
+  _plot: MultislotPlot;
+  _username: string;
+  _originalClaimant: string;
+  _listener: Function;
   _listenerThisArg: any;
-  _version: any;
+  _version: number;
 
   constructor(plot: MultislotPlot, username: string) {
     this._plot = plot;
@@ -231,11 +256,11 @@ class ClaimPlotAction {
 }
 
 class UnclaimPlotAction {
-  _plot: any;
-  _originalClaimant: any;
-  _listener: any;
+  _plot: MultislotPlot;
+  _originalClaimant: string;
+  _listener: Function;
   _listenerThisArg: any;
-  _version: any;
+  _version: number;
 
   constructor(plot: MultislotPlot) {
     this._plot = plot;

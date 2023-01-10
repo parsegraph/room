@@ -2,19 +2,21 @@ import { BlockCaret, BlockNode, DefaultBlockPalette } from "parsegraph-block";
 import Direction from "parsegraph-direction";
 import { elapsed } from "parsegraph-timing";
 import Method from "parsegraph-method";
-import { Carousel } from "parsegraph-viewport";
+import Navport from 'parsegraph-viewport';
+import TreeNode from 'parsegraph-treenode';
 
 const START_TIME = new Date();
 
 export type ListId = string | number;
 
 export interface ListType {
-  spawnItem(room: Room, value: any, children: any[], id: ListId): any;
+  spawnItem(room: Room, value: any, children: ListItem[], id: ListId): TreeNode;
 }
 
 export interface ListItem {
   id: string;
   type: string;
+  username?: string;
   value: any;
   items: ListItem[];
 }
@@ -36,7 +38,7 @@ export default class Room {
   _eventSource: EventSource;
   _root: BlockNode;
   _itemListeners: any;
-  _items: Map<ListId, ListItem>;
+  _items: Map<ListId, TreeNode>;
   _ids: any;
   _actions: any[];
   _firedActions: any;
@@ -44,10 +46,18 @@ export default class Room {
   _sessionId: string;
   _update: Method;
   _listClasses: Map<string, ListType>;
-  _carousel: Carousel;
+  _nav: Navport;
 
-  constructor(carousel: Carousel, roomId: string = null) {
-    this._carousel = carousel;
+  carousel() {
+    return this._nav.carousel();
+  }
+
+  nav() {
+    return this._nav;
+  }
+
+  constructor(nav: Navport, roomId: string = null) {
+    this._nav = nav;
     this._root = new DefaultBlockPalette().spawn();
     this._listClasses = new Map();
     this._update = new Method();
@@ -129,10 +139,6 @@ export default class Room {
     alert("Toggle permissions");
   }
 
-  carousel() {
-    return this._carousel;
-  }
-
   node() {
     return this._root;
   }
@@ -187,7 +193,11 @@ export default class Room {
       car.pull("d");
       const item = items[i];
       const widget = this.spawnItem(item.id, item.type, item.value, item.items);
-      car.connect("d", widget.node());
+      car.connect("d", widget.root());
+      const n = car.node();
+      widget.setOnScheduleUpdate(()=>{
+        n.connectNode(Direction.DOWNWARD, widget.root());
+      });
       car.pop();
     }
     this.scheduleUpdate();
@@ -253,7 +263,7 @@ export default class Room {
     return this._sessionId;
   }
 
-  addLoader(type: string, klass: any) {
+  addLoader(type: string, klass: ListType) {
     this._listClasses.set(type, klass);
   }
 
@@ -275,7 +285,7 @@ export default class Room {
     );
   }
 
-  getId(item: any) {
+  getId(item: TreeNode) {
     if (this._ids) {
       const val = this._ids.get(item);
       if (val) {
@@ -284,7 +294,7 @@ export default class Room {
       return null;
     }
     let foundId = null;
-    this._items.forEach((val: ListItem, key: ListId) => {
+    this._items.forEach((val: TreeNode, key: ListId) => {
       if (item === val) {
         foundId = key;
       }
@@ -292,7 +302,7 @@ export default class Room {
     return foundId;
   }
 
-  register(item: any, id: ListId) {
+  register(item: TreeNode, id: ListId) {
     if (this._items.has(id)) {
       if (this._items.get(id) !== item) {
         throw new Error("Refusing to overwrite item " + id + " with " + item);

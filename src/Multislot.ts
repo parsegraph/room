@@ -1,17 +1,18 @@
 import Room, { ListType } from "./Room";
 import Color from "parsegraph-color";
-import { BlockCaret, BlockNode, copyStyle } from "parsegraph-block";
+import { BlockCaret, copyStyle } from "parsegraph-block";
 import { ActionCarousel } from "parsegraph-viewport";
 import MultislotPlot from "./MultislotPlot";
+import TreeNode from 'parsegraph-treenode';
+import {ListItem} from './Room';
 
 export type MultislotSubtype = number;
 
-export default class Multislot {
+export default class Multislot extends TreeNode {
   _room: Room;
   _plots: MultislotPlot[];
   _id: number;
 
-  _root: BlockNode;
   _columnSize: number;
   _rowSize: number;
   _size: number;
@@ -25,20 +26,24 @@ export default class Multislot {
     color: Color,
     subtype: MultislotSubtype
   ) {
+    super(room.nav());
     this._room = room;
     this._plots = [];
     this._id = null;
 
-    const car = new BlockCaret("b");
-    this._root = car.node();
     this._size = rowSize * columnSize;
     this._columnSize = columnSize;
     this._rowSize = rowSize;
     this._color = color;
+    this._subtype = subtype;
+    this.setOnScheduleUpdate(()=>room.scheduleUpdate());
+  }
 
-    this.build(car, subtype);
+  render() {
+    const car = new BlockCaret("b");
+    this.build(car, this._subtype);
 
-    const multislotActions = new ActionCarousel(room.carousel());
+    const multislotActions = new ActionCarousel(this.nav().carousel());
     multislotActions.addAction(
       "Edit",
       () => {
@@ -46,10 +51,10 @@ export default class Multislot {
       },
       this
     );
-    multislotActions.install(this.node());
+    multislotActions.install(car.root());
 
-    this._root.value().setLabel("" + subtype);
-    this._subtype = subtype;
+    car.label(String(this._subtype));
+    return car.root();
   }
 
   setId(id: number) {
@@ -64,16 +69,8 @@ export default class Multislot {
     return this._color;
   }
 
-  node() {
-    return this._root;
-  }
-
   room() {
     return this._room;
-  }
-
-  scheduleUpdate() {
-    return this.room().scheduleUpdate();
   }
 
   getPlot(index: number) {
@@ -113,7 +110,10 @@ export default class Multislot {
       car.push();
       for (let x = 0; x < this._rowSize; ++x) {
         const plot = this.spawnPlot();
-        car.connect("f", plot.node());
+        car.connect("f", plot.root());
+        plot.setOnScheduleUpdate(()=>{
+          car.connect("f", plot.root());
+        });
         car.move("f");
         // console.log(x + ", " + y);
       }
@@ -146,7 +146,10 @@ export default class Multislot {
         car.node().value().setBlockStyle(this.cs());
         car.pull("f");
         const plot = this.spawnPlot();
-        car.connect("f", plot.node());
+        plot.setOnScheduleUpdate(()=>{
+          car.connect("f", plot.root());
+        });
+        car.connect("f", plot.root());
       }
       car.pop();
       car.pull("d");
@@ -180,7 +183,10 @@ export default class Multislot {
         car.spawnMove("d", "s");
         car.node().value().setBlockStyle(this.cs());
         const plot = this.spawnPlot();
-        car.connect("f", plot.node());
+        car.connect("f", plot.root());
+        plot.setOnScheduleUpdate(()=>{
+          car.connect("f", plot.root());
+        });
         car.pull("f");
       }
       car.pop();
@@ -216,7 +222,10 @@ export default class Multislot {
         car.node().value().setBlockStyle(this.cs());
         car.pull("b");
         const plot = this.spawnPlot();
-        car.connect("b", plot.node());
+        car.connect("b", plot.root());
+        plot.setOnScheduleUpdate(()=>{
+          car.connect("b", plot.root());
+        });
       }
       car.pop();
       car.pull("d");
@@ -251,7 +260,10 @@ export default class Multislot {
         car.spawnMove("b", "s");
         car.node().value().setBlockStyle(this.cs());
         const plot = this.spawnPlot();
-        car.connect("d", plot.node());
+        car.connect("d", plot.root());
+        plot.setOnScheduleUpdate(()=>{
+          car.connect("d", plot.root());
+        });
         car.pull("d");
         console.log(x + ", " + y);
       }
@@ -280,7 +292,7 @@ export default class Multislot {
 }
 
 export class MultislotType implements ListType {
-  spawnItem(room: Room, value: any, children: any[], id: number) {
+  spawnItem(room: Room, value: any, items: ListItem[], id: number) {
     const params = JSON.parse(value);
     const subtype = params[0];
     const rowSize = params[1];
@@ -288,19 +300,38 @@ export class MultislotType implements ListType {
     const color = new Color(params[3] / 255, params[4] / 255, params[5] / 255);
     const multislot = new Multislot(room, rowSize, columnSize, color, subtype);
     multislot.setId(id);
-    for (let i = 0; i < children.length; ++i) {
-      const child = children[i];
+    const claimPlot = (child:ListItem)=>{
+      console.log(child);
+      const plotData = JSON.parse(child.value);
+      const plot = multislot.getPlot(plotData[0]);
+      plot.setId(child.id);
+      plot.claim(child.username);
+      child.items.forEach(item=>{
+        const elem = room.spawnItem(item.id, item.type, item.value, item.items);
+        plot.children().appendChild(elem);
+      });
+      room.scheduleUpdate();
+    }
+    for (let i = 0; i < items.length; ++i) {
+      const child = items[i];
       console.log(child);
       if (child.type === "multislot::plot") {
-        const plotData = JSON.parse(child.value);
-        const plot = multislot.getPlot(plotData[0]);
-        plot.setId(child.id);
-        plot.claim(child.username);
-        console.log(child);
+        claimPlot(child);
       } else {
         throw new Error("Unexpected type: " + child.type);
       }
     }
+    room.listen(id, (e:any)=>{
+      switch(e.event) {
+      case "pushListItem":
+        if (e.item.type === "multislot::plot") {
+          claimPlot(e.item);
+        }
+        break;
+      default:
+        console.log("Multislot event", e);
+      }
+    });
     return multislot;
   }
 }
