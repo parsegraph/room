@@ -33,7 +33,7 @@ export default class MultislotPlot extends TreeNode {
 
   constructor(multislot: Multislot, index: number) {
     super(multislot.nav());
-    this.setOnScheduleUpdate(()=>multislot.invalidate());
+    this.setOnScheduleUpdate(() => multislot.invalidate());
     this._index = index;
     this._multislot = multislot;
     this._version = 0;
