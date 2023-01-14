@@ -3,15 +3,11 @@ import Direction from "parsegraph-direction";
 import { elapsed } from "parsegraph-timing";
 import Method from "parsegraph-method";
 import Navport from "parsegraph-viewport";
-import TreeNode from 'parsegraph-treenode';
+import TreeNode, { BlockTreeNode } from "parsegraph-treenode";
 
 const START_TIME = new Date();
 
 export type ListId = string | number;
-
-export interface ListType {
-  spawnItem(room: Room, value: any, children: ListItem[], id: ListId): TreeNode;
-}
 
 export interface ListItem {
   id: string;
@@ -20,6 +16,17 @@ export interface ListItem {
   value: any;
   items: ListItem[];
 }
+
+export interface ListType {
+  spawnItem(room: Room, value: any, children: ListItem[], id: ListId): TreeNode;
+}
+
+export type ItemSpawner = (
+  room: Room,
+  value: any,
+  children: ListItem[],
+  id: ListId
+) => TreeNode;
 
 export function getRoomName() {
   const atSymbol = document.URL.lastIndexOf("/@");
@@ -45,7 +52,7 @@ export default class Room {
   _username: string;
   _sessionId: string;
   _update: Method;
-  _listClasses: Map<string, ListType>;
+  _itemSpawners: Map<string, ItemSpawner>;
   _nav: Navport;
 
   carousel() {
@@ -59,7 +66,7 @@ export default class Room {
   constructor(nav: Navport, roomId: string = null) {
     this._nav = nav;
     this._root = new DefaultBlockPalette().spawn();
-    this._listClasses = new Map();
+    this._itemSpawners = new Map();
     this._update = new Method();
 
     if (roomId) {
@@ -191,13 +198,20 @@ export default class Room {
       }
       car.push();
       car.pull("d");
-      const item = items[i];
-      const widget = this.spawnItem(item.id, item.type, item.value, item.items);
-      car.connect("d", widget.root());
-      const n = car.node();
-      widget.setOnScheduleUpdate(()=>{
-        n.connectNode(Direction.DOWNWARD, widget.root());
-      });
+      ((item: ListItem) => {
+        const widget = this.spawnItem(
+          item.id,
+          item.type,
+          item.value,
+          item.items
+        );
+        car.connect("d", widget.root());
+        const n = car.node();
+        widget.setOnScheduleUpdate(() => {
+          n.connectNode(Direction.DOWNWARD, widget.root());
+          this.scheduleUpdate();
+        });
+      })(items[i]);
       car.pop();
     }
     this.scheduleUpdate();
@@ -263,26 +277,29 @@ export default class Room {
     return this._sessionId;
   }
 
-  addLoader(type: string, klass: ListType) {
-    this._listClasses.set(type, klass);
+  addItemSpawner(type: string, klass: ListType | ItemSpawner) {
+    if (typeof klass !== "function") {
+      const obj: ListType = klass;
+      klass = (...args) => {
+        return obj.spawnItem(...args);
+      };
+    }
+    this._itemSpawners.set(type, klass);
   }
 
-  getLoader(type: string) {
-    return this._listClasses.get(type);
+  getItemSpawner(type: string) {
+    return this._itemSpawners.get(type);
   }
 
   spawnItem(id: ListId, type: string, value: any, items: any[]) {
-    const klass = this.getLoader(type);
-    if (!klass) {
-      throw new Error("Block type not recognized: " + type);
+    const itemSpawner = this.getItemSpawner(type);
+    if (!itemSpawner) {
+      return new BlockTreeNode("b", "Block type not recognized: " + type);
     }
     if (this._items.has(id)) {
       throw new Error("Item was already spawned:" + id);
     }
-    return this.register(
-      klass.spawnItem.call(klass, this, value, items, id),
-      id
-    );
+    return this.register(itemSpawner(this, value, items, id), id);
   }
 
   getId(item: TreeNode) {
