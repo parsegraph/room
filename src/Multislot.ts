@@ -74,6 +74,9 @@ export default class Multislot extends TreeNode {
   }
 
   getPlot(index: number) {
+    if (this.needsUpdate()) {
+      this.root();
+    }
     return this._plots[index];
   }
 
