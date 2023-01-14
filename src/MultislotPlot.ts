@@ -8,7 +8,7 @@ import { ActionCarousel } from "parsegraph-viewport";
 import Color from "parsegraph-color";
 import Multislot from "./Multislot";
 import Direction from "parsegraph-direction";
-import TreeNode, {Spawner, BlockTreeNode} from 'parsegraph-treenode';
+import TreeNode, { Spawner, BlockTreeNode } from "parsegraph-treenode";
 
 export default class MultislotPlot extends TreeNode {
   _multislot: Multislot;
@@ -66,7 +66,6 @@ export default class MultislotPlot extends TreeNode {
 
     this._claimedStyle = copyStyle("s");
     this._claimedStyle.backgroundColor = new Color(1, 1, 1);
-
 
     const carousel = multislot.room().carousel();
     this._unclaimedActions = new ActionCarousel(carousel);
@@ -148,8 +147,7 @@ export default class MultislotPlot extends TreeNode {
 
   populate() {}
 
-  depopulate() {
-  }
+  depopulate() {}
 
   unclaim() {
     this._claimant = null;

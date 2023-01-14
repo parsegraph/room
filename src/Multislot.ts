@@ -3,8 +3,8 @@ import Color from "parsegraph-color";
 import { BlockCaret, copyStyle } from "parsegraph-block";
 import { ActionCarousel } from "parsegraph-viewport";
 import MultislotPlot from "./MultislotPlot";
-import TreeNode from 'parsegraph-treenode';
-import {ListItem} from './Room';
+import TreeNode from "parsegraph-treenode";
+import { ListItem } from "./Room";
 
 export type MultislotSubtype = number;
 
@@ -36,7 +36,7 @@ export default class Multislot extends TreeNode {
     this._rowSize = rowSize;
     this._color = color;
     this._subtype = subtype;
-    this.setOnScheduleUpdate(()=>room.scheduleUpdate());
+    this.setOnScheduleUpdate(() => room.scheduleUpdate());
   }
 
   render() {
@@ -300,13 +300,13 @@ export class MultislotType implements ListType {
     const color = new Color(params[3] / 255, params[4] / 255, params[5] / 255);
     const multislot = new Multislot(room, rowSize, columnSize, color, subtype);
     multislot.setId(id);
-    const claimPlot = (child:ListItem)=>{
+    const claimPlot = (child: ListItem) => {
       console.log(child);
       const plotData = JSON.parse(child.value);
       const plot = multislot.getPlot(plotData[0]);
       plot.setId(child.id);
       plot.claim(child.username);
-      child.items.forEach(item=>{
+      child.items.forEach((item) => {
         const elem = room.spawnItem(item.id, item.type, item.value, item.items);
         plot.children().appendChild(elem);
       });

@@ -2,7 +2,7 @@ import { BlockCaret, BlockNode, DefaultBlockPalette } from "parsegraph-block";
 import Direction from "parsegraph-direction";
 import { elapsed } from "parsegraph-timing";
 import Method from "parsegraph-method";
-import Navport from 'parsegraph-viewport';
+import Navport from "parsegraph-viewport";
 import TreeNode from 'parsegraph-treenode';
 
 const START_TIME = new Date();
