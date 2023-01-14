@@ -9,6 +9,7 @@ import Color from "parsegraph-color";
 import Multislot from "./Multislot";
 import Direction from "parsegraph-direction";
 import TreeNode, { Spawner, BlockTreeNode } from "parsegraph-treenode";
+import { v4 as uuid } from "uuid";
 
 export default class MultislotPlot extends TreeNode {
   _multislot: Multislot;
@@ -41,20 +42,24 @@ export default class MultislotPlot extends TreeNode {
 
     this._palette = new DefaultBlockPalette();
     this._children = new Spawner(multislot.room().nav(), []);
-    this._children.setOnScheduleUpdate(()=>{
-      this._root.connectNode(Direction.DOWNWARD, this._children.root());
-    });
-    this._children.setBuilder(()=>{
-      const n = new BlockTreeNode('u');
+    this._children.setBuilder(() => {
+      const n = new BlockTreeNode("u");
 
-      const ac = new ActionCarousel(multislot.room().nav().carousel(), this._palette);
-      ac.addAction("Build a room", ()=>{
+      const ac = new ActionCarousel(
+        multislot.room().nav().carousel(),
+        this._palette
+      );
+      ac.addAction("Lisp", () => {
+        this.room().pushListItem(this.id(), "lisp", "(hello world)");
       });
-      ac.addAction("Link to room", ()=>{
+      ac.addAction("Audio", () => {
+        this.room().pushListItem(this.id(), "audio", "");
       });
-      ac.addAction("Link to server", ()=>{
+      ac.addAction("Calendar", () => {
+        this.room().pushListItem(this.id(), "calendar", "");
       });
-      ac.addAction("Host a server", ()=>{
+      ac.addAction("Server", () => {
+        this.room().pushListItem(this.id(), "server", uuid());
       });
       ac.install(n.root());
       return n;
@@ -108,6 +113,11 @@ export default class MultislotPlot extends TreeNode {
       car.node().value().setLabel(this.claimant());
       car.node().value().setBlockStyle(this._claimedStyle);
       car.node().connectNode(Direction.DOWNWARD, this._children.root());
+      const n = car.node();
+      this._children.setOnScheduleUpdate(() => {
+        n.connectNode(Direction.DOWNWARD, this._children.root());
+        this.invalidate();
+      });
     } else {
       car.spawn("d", "u");
       car.pull("d");

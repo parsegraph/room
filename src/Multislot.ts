@@ -5,6 +5,7 @@ import { ActionCarousel } from "parsegraph-viewport";
 import MultislotPlot from "./MultislotPlot";
 import TreeNode from "parsegraph-treenode";
 import { ListItem } from "./Room";
+import Direction from "parsegraph-direction";
 
 export type MultislotSubtype = number;
 
@@ -112,13 +113,16 @@ export default class Multislot extends TreeNode {
       }
       car.push();
       for (let x = 0; x < this._rowSize; ++x) {
-        const plot = this.spawnPlot();
-        car.connect("f", plot.root());
-        plot.setOnScheduleUpdate(()=>{
+        (() => {
+          const plot = this.spawnPlot();
           car.connect("f", plot.root());
-        });
-        car.move("f");
-        // console.log(x + ", " + y);
+          const n = car.node();
+          plot.setOnScheduleUpdate(() => {
+            n.connectNode(Direction.FORWARD, plot.root());
+          });
+          car.move("f");
+          // console.log(x + ", " + y);
+        })();
       }
       car.pop();
       // car.crease();
@@ -144,15 +148,18 @@ export default class Multislot extends TreeNode {
       }
       car.push();
       for (let x = 0; x < this._rowSize; ++x) {
-        car.spawnMove("d", "u");
-        car.replace("u");
-        car.node().value().setBlockStyle(this.cs());
-        car.pull("f");
-        const plot = this.spawnPlot();
-        plot.setOnScheduleUpdate(()=>{
+        (() => {
+          car.spawnMove("d", "u");
+          car.replace("u");
+          car.node().value().setBlockStyle(this.cs());
+          car.pull("f");
+          const plot = this.spawnPlot();
+          const n = car.node();
+          plot.setOnScheduleUpdate(() => {
+            n.connectNode(Direction.FORWARD, plot.root());
+          });
           car.connect("f", plot.root());
-        });
-        car.connect("f", plot.root());
+        })();
       }
       car.pop();
       car.pull("d");
@@ -179,18 +186,21 @@ export default class Multislot extends TreeNode {
       }
       car.push();
       for (let x = 0; x < this._rowSize; ++x) {
-        if (x > 0) {
-          car.spawnMove("d", "u");
+        (() => {
+          if (x > 0) {
+            car.spawnMove("d", "u");
+            car.node().value().setBlockStyle(this.cs());
+          }
+          car.spawnMove("d", "s");
           car.node().value().setBlockStyle(this.cs());
-        }
-        car.spawnMove("d", "s");
-        car.node().value().setBlockStyle(this.cs());
-        const plot = this.spawnPlot();
-        car.connect("f", plot.root());
-        plot.setOnScheduleUpdate(()=>{
+          const plot = this.spawnPlot();
           car.connect("f", plot.root());
-        });
-        car.pull("f");
+          const n = car.node();
+          plot.setOnScheduleUpdate(() => {
+            n.connectNode(Direction.FORWARD, plot.root());
+          });
+          car.pull("f");
+        })();
       }
       car.pop();
       car.pull("d");
@@ -226,9 +236,11 @@ export default class Multislot extends TreeNode {
         car.pull("b");
         const plot = this.spawnPlot();
         car.connect("b", plot.root());
-        plot.setOnScheduleUpdate(()=>{
-          car.connect("b", plot.root());
-        });
+        ((n) => {
+          plot.setOnScheduleUpdate(() => {
+            n.connectNode(Direction.BACKWARD, plot.root());
+          });
+        })(car.node());
       }
       car.pop();
       car.pull("d");
@@ -263,10 +275,12 @@ export default class Multislot extends TreeNode {
         car.spawnMove("b", "s");
         car.node().value().setBlockStyle(this.cs());
         const plot = this.spawnPlot();
-        car.connect("d", plot.root());
-        plot.setOnScheduleUpdate(()=>{
+        ((n) => {
           car.connect("d", plot.root());
-        });
+          plot.setOnScheduleUpdate(() => {
+            n.connectNode(Direction.DOWNWARD, plot.root());
+          });
+        })(car.node());
         car.pull("d");
         console.log(x + ", " + y);
       }
@@ -313,8 +327,24 @@ export class MultislotType implements ListType {
         const elem = room.spawnItem(item.id, item.type, item.value, item.items);
         plot.children().appendChild(elem);
       });
+      room.listen(child.id, (e: any) => {
+        switch (e.event) {
+          case "pushListItem":
+            const elem = room.spawnItem(
+              e.item.id,
+              e.item.type,
+              e.item.value,
+              e.item.items
+            );
+            plot.children().appendChild(elem);
+            room.scheduleUpdate();
+            break;
+          default:
+            console.log("Plot event", child.id, e);
+        }
+      });
       room.scheduleUpdate();
-    }
+    };
     for (let i = 0; i < items.length; ++i) {
       const child = items[i];
       console.log(child);
