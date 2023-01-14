@@ -354,15 +354,15 @@ export class MultislotType implements ListType {
         throw new Error("Unexpected type: " + child.type);
       }
     }
-    room.listen(id, (e:any)=>{
-      switch(e.event) {
-      case "pushListItem":
-        if (e.item.type === "multislot::plot") {
-          claimPlot(e.item);
-        }
-        break;
-      default:
-        console.log("Multislot event", e);
+    room.listen(id, (e: any) => {
+      switch (e.event) {
+        case "pushListItem":
+          if (e.item.type === "multislot::plot") {
+            claimPlot(e.item);
+          }
+          break;
+        default:
+          console.log("Multislot event", e);
       }
     });
     return multislot;
