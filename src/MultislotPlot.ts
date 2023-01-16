@@ -112,6 +112,7 @@ export default class MultislotPlot extends TreeNode {
       car.move("d");
       car.node().value().setLabel(this.claimant());
       car.node().value().setBlockStyle(this._claimedStyle);
+      car.align('d', 'c');
       car.node().connectNode(Direction.DOWNWARD, this._children.root());
       const n = car.node();
       this._children.setOnScheduleUpdate(() => {
