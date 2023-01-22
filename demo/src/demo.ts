@@ -4,7 +4,9 @@ const app = express();
 const { readFileSync, statSync } = require("fs");
 const path = require("path");
 
-const { DIST_NAME } = require("../webpack.common");
+const { DIST_NAME } = require("../../webpack.common");
+
+import roomRouter from "./room";
 
 const getPort = (port) => {
   if (statSync("../demo.port")) {
@@ -42,6 +44,8 @@ const getRootPath = () => {
   return "";
 };
 const root = getRootPath();
+
+app.use("/", roomRouter);
 
 async function getDemos() {
   return new Promise((respond, reject) => {

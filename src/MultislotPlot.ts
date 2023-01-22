@@ -75,12 +75,12 @@ export default class MultislotPlot extends TreeNode {
     const carousel = multislot.room().carousel();
     this._unclaimedActions = new ActionCarousel(carousel);
     this._unclaimedActions.addAction("Claim", () => {
-      console.log("Claiming");
       const room = this._multislot.room();
       const username = room.username();
       if (!username) {
         throw new Error("Room must have a valid username");
       }
+      console.log("Claiming for " + username);
       this.room().submit(new ClaimPlotAction(this, username));
     });
 
@@ -107,12 +107,13 @@ export default class MultislotPlot extends TreeNode {
     car.label(String(this._index));
 
     if (this.isClaimed()) {
+      console.log("Rendering claimed plot");
       car.spawn("d", "b");
       car.pull("d");
       car.move("d");
       car.node().value().setLabel(this.claimant());
       car.node().value().setBlockStyle(this._claimedStyle);
-      car.align('d', 'c');
+      car.align("d", "c");
       car.node().connectNode(Direction.DOWNWARD, this._children.root());
       const n = car.node();
       this._children.setOnScheduleUpdate(() => {
@@ -120,6 +121,7 @@ export default class MultislotPlot extends TreeNode {
         this.invalidate();
       });
     } else {
+      console.log("Rendering unclaimed plot");
       car.spawn("d", "u");
       car.pull("d");
       car.move("d");
@@ -152,6 +154,7 @@ export default class MultislotPlot extends TreeNode {
   }
 
   claim(name: string) {
+    console.log("Plot claimed for " + name);
     this._claimant = name;
     this.invalidate();
   }
@@ -222,8 +225,10 @@ class ClaimPlotAction {
   }
 
   advance() {
+    console.log("Advancing plot claim");
     const multislotId = this.room().getId(this.multislot());
     if (multislotId === null) {
+      console.log("No multislot");
       return false;
     }
     this._originalClaimant = this._plot.claimant();
@@ -240,6 +245,7 @@ class ClaimPlotAction {
   }
 
   reverse() {
+    console.log("Reversing plot claim");
     if (this._plot.version() !== this._version) {
       // Preempted.
       return false;
@@ -253,6 +259,7 @@ class ClaimPlotAction {
   }
 
   receive(err: any) {
+    console.log("Received plot claim response: " + err);
     if (err) {
       this.reverse();
     } else {

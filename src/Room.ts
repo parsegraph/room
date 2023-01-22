@@ -69,7 +69,9 @@ export default class Room {
     this._itemSpawners = new Map();
     this._update = new Method();
 
+    console.log("Creaitng room");
     if (roomId) {
+      console.log("loading room: " + roomId);
       this._roomId = roomId;
       this._eventSource = new EventSource("/@" + this._roomId + "/live");
       this._eventSource.onmessage = (e) => {
@@ -418,6 +420,7 @@ export default class Room {
   }
 
   process() {
+    console.log("processing actiosn");
     while (this._firedActions < this._actions.length) {
       try {
         const action = this._actions[this._firedActions++];

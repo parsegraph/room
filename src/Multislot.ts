@@ -358,6 +358,7 @@ export class MultislotType implements ListType {
       switch (e.event) {
         case "pushListItem":
           if (e.item.type === "multislot::plot") {
+            console.log("claiming plot");
             claimPlot(e.item);
           }
           break;
