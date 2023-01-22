@@ -58,7 +58,12 @@
   },
   "dependencies": {
     "@types/uuid": "^9.0.0",
+    "parsegraph-block": "^4.6.17",
+    "parsegraph-color": "^1.4.11",
+    "parsegraph-direction": "^2.2.1",
+    "parsegraph-method": "^1.4.24",
     "parsegraph-stream": "^3.0.9",
+    "parsegraph-timing": "^1.4.17",
     "parsegraph-treenode": "^2.0.36",
     "parsegraph-viewport": "^2.9.8",
     "uuid": "^9.0.0"
