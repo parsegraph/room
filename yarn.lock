@@ -2674,9 +2674,9 @@ fast-levenshtein@^2.0.6, fast-levenshtein@~2.0.6:
   integrity sha1-PYpcZog6FqMMqGQ+hR8Zuqd5eRc=
 
 fast-xml-parser@^4.0.9:
-  version "4.0.13"
-  resolved "https://registry.yarnpkg.com/fast-xml-parser/-/fast-xml-parser-4.0.13.tgz#dab3e7ea17d39805af0a9f6d041f4c975c2b9b58"
-  integrity sha512-g+OboAw8ol1FgTHhKLR7ZHcItNudceiY04BBrvqa0JBWoPhi/+e5r4H5AeW+EsQCroJLJwsuOP3dD3c6cc5uOg==
+  version "4.0.14"
+  resolved "https://registry.yarnpkg.com/fast-xml-parser/-/fast-xml-parser-4.0.14.tgz#879fd082a9db4b5f75ae344a6cab7ec3b0d9edd0"
+  integrity sha512-uKe7uxZ9DgNOmHfUmBdhkTBZcMMVxvQ3vELTxUpmotAqRxkpMayEiiQ4AQWTGAVyfzT4Dv79jaszLECWCYbd4w==
   dependencies:
     strnum "^1.0.5"
 
@@ -4261,10 +4261,10 @@ parsegraph-spotlightpainter@^2.3.14:
     parsegraph-matrix "^1.4.13"
     parsegraph-pagingbuffer "^2.1.5"
 
-parsegraph-stream@^3.0.9:
-  version "3.0.9"
-  resolved "https://registry.yarnpkg.com/parsegraph-stream/-/parsegraph-stream-3.0.9.tgz#4a10a0ff490423a165344daf691125f00ef5cf38"
-  integrity sha512-Yyqas/cuV3a2F9Vy0iWCPNC9aWqac/rc82bUcG/ziPe1hOW6mDhmddQ+GByPhV8VVqzQ495hUjxkeo8NRRChSw==
+parsegraph-stream@^3.0.11:
+  version "3.0.11"
+  resolved "https://registry.yarnpkg.com/parsegraph-stream/-/parsegraph-stream-3.0.11.tgz#a761676c2a17d5448cede6c0b35fd19025fb741d"
+  integrity sha512-uCVK/dWBsYw9ga+9EDqb8Do4AKPWH8Y/SDOBmBTfxfiD+sge9rei3g3+kagtgc7MXmfkGdHEwYmTaS4kZTcsjw==
   dependencies:
     espree "^9.4.1"
     esprima "^4.0.1"
