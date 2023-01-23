@@ -4091,6 +4091,16 @@ parsegraph-blockpainter@^1.7.8:
     parsegraph-matrix "^1.4.15"
     parsegraph-rect "^1.5.4"
 
+parsegraph-blockpainter@^1.7.9:
+  version "1.7.9"
+  resolved "https://registry.yarnpkg.com/parsegraph-blockpainter/-/parsegraph-blockpainter-1.7.9.tgz#8088ea005e883a63ea350ca9692eab51ae470e83"
+  integrity sha512-TPvjPkE8M4Ec6+sJTrEFpNbGlbrCRRN9wBidJMnISNSZqzdy1uL4fK5w2NGqX4MVKGd2oSkx8ZmuRAlTT1fO9w==
+  dependencies:
+    parsegraph-color "^1.4.12"
+    parsegraph-compileprogram "^2.2.20"
+    parsegraph-matrix "^1.4.15"
+    parsegraph-rect "^1.5.4"
+
 parsegraph-camera@^1.4.19:
   version "1.4.19"
   resolved "https://registry.yarnpkg.com/parsegraph-camera/-/parsegraph-camera-1.4.19.tgz#ea4e741ae6bed71bd51d23d9525072125dd20a61"
@@ -4444,19 +4454,19 @@ parsegraph-spotlightpainter@^2.3.14:
     parsegraph-matrix "^1.4.13"
     parsegraph-pagingbuffer "^2.1.5"
 
-parsegraph-stream@^3.0.15:
-  version "3.0.15"
-  resolved "https://registry.yarnpkg.com/parsegraph-stream/-/parsegraph-stream-3.0.15.tgz#ed38bd8b68386a0fcbb6d242102be8a586e12bea"
-  integrity sha512-bV9unSbFwuQgPj+T8nfGq+ThslZsToRTzANtyOYtBNIlhHOSi7GnqJgbrNwE5uAJcQRZPvmjN54H87bGbINigw==
+parsegraph-stream@^3.0.16:
+  version "3.0.16"
+  resolved "https://registry.yarnpkg.com/parsegraph-stream/-/parsegraph-stream-3.0.16.tgz#69f1eb3aec85fa4fc54ab77d6bd371df68e23a5b"
+  integrity sha512-r9yD4+EA8JTDkFIoct19EDh13jwVpSD2QI58kf5bw+rgBkqgbbgUANtBbIQgb7X5V17gAUPx9eDNYOCo6FpoBA==
   dependencies:
     espree "^9.4.1"
     esprima "^4.0.1"
     fast-xml-parser "^4.0.9"
-    parsegraph-artist "^3.4.58"
-    parsegraph-block "^4.6.17"
-    parsegraph-blockpainter "^1.7.8"
+    parsegraph-artist "^3.4.61"
+    parsegraph-block "^4.6.20"
+    parsegraph-blockpainter "^1.7.9"
     parsegraph-color "^1.4.12"
-    parsegraph-direction "^2.2.3"
+    parsegraph-direction "^2.2.4"
     react "^18.2.0"
     react-reconciler "^0.29.0"
     webpack-bundle-analyzer "^4.7.0"
