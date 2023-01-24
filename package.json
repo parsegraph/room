@@ -64,8 +64,8 @@
     "parsegraph-method": "^1.4.25",
     "parsegraph-stream": "^3.0.17",
     "parsegraph-timing": "^1.4.19",
-    "parsegraph-treenode": "^2.0.39",
-    "parsegraph-viewport": "^2.9.8",
+    "parsegraph-treenode": "^2.0.41",
+    "parsegraph-viewport": "^2.9.13",
     "uuid": "^9.0.0"
   }
 }
