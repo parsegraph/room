@@ -62,7 +62,7 @@
     "parsegraph-color": "^1.4.12",
     "parsegraph-direction": "^2.2.4",
     "parsegraph-method": "^1.4.25",
-    "parsegraph-stream": "^3.0.21",
+    "parsegraph-stream": "^3.0.22",
     "parsegraph-timing": "^1.4.19",
     "parsegraph-treenode": "^2.0.42",
     "parsegraph-viewport": "^2.9.14",
